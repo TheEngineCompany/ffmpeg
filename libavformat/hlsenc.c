@@ -316,6 +316,10 @@ fail:
     return ret;
 }
 
+// Added with patch for MeMVideoEngine
+typedef void (*HLS_CALLBACK)(const char *segmentName); 
+HLS_CALLBACK gHLSCallback = NULL;
+
 static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     HLSContext *hls = s->priv_data;
@@ -363,6 +367,9 @@ static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
             hls->number++;
         } else {
             avio_close(oc->pb);
+            
+            if(gHLSCallback)
+				gHLSCallback(hls->segments->filename);
 
             ret = hls_start(s);
         }
