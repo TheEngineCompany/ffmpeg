@@ -53,6 +53,10 @@
 #include "internal.h"
 #include "os_support.h"
 
+// Added with patch for MeMVideoEngine
+typedef void (*HLS_CALLBACK)(const char *segmentName);
+HLS_CALLBACK gHLSCallback = NULL;
+
 typedef enum {
     HLS_START_SEQUENCE_AS_START_NUMBER = 0,
     HLS_START_SEQUENCE_AS_SECONDS_SINCE_EPOCH = 1,
@@ -294,6 +298,10 @@ static int hlsenc_io_close(AVFormatContext *s, AVIOContext **pb, char *filename)
         ret = ff_http_get_shutdown_status(http_url_context);
 #endif
     }
+
+    if(gHLSCallback)
+        gHLSCallback(filename);
+
     return ret;
 }
 
